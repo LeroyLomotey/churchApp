@@ -10,7 +10,7 @@
 .svn/
 migrate_working_dir/
 keys.dart
-
+firebase_options.dart
 # IntelliJ related
 *.iml
 *.ipr

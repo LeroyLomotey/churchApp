@@ -34,7 +34,7 @@ eventCard(BuildContext context, Event event) {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.only(bottom: 8),
                     child: Text(
                       AppData.formatDate(event.dateTime),
                       style: const TextStyle(fontSize: 14),
@@ -42,8 +42,16 @@ eventCard(BuildContext context, Event event) {
                   ),
                   Text(
                     event.description,
-                    maxLines: 4,
+                    maxLines: 6,
                     style: const TextStyle(fontSize: 14),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8, bottom: 8),
+                    child: Text(
+                      event.location,
+                      maxLines: 2,
+                      style: const TextStyle(fontSize: 14),
+                    ),
                   ),
                   if (event.rsvp)
                     Row(

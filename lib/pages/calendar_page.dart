@@ -23,9 +23,6 @@ class _CalendarPageState extends State<CalendarPage> {
   List<Event> loadEvents(DateTime day) {
     return eventData.where((event) {
       var eventDay = DateTime.parse(event.dateTime);
-      print('Original dateTime is ${event.dateTime}');
-      print('DateTime parsed - $eventDay');
-      print('Current day is  - $day \n');
       bool onSameDay = isSameDay(eventDay, day);
       bool recurring =
           (event.recurring == true) && (eventDay.weekday == day.weekday);
@@ -36,8 +33,6 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) {
     eventData = Provider.of<AppData>(context).eventData;
-    print('eventData in calendar? $eventData');
-    print(_selectedEvents);
     _selectedEvents = loadEvents(_focusedDay);
     return Column(children: [
       Container(
@@ -109,8 +104,8 @@ class _CalendarPageState extends State<CalendarPage> {
                                 style: const TextStyle(color: Colors.white),
                                 maxLines: 1,
                                 overflow: TextOverflow.fade,
-                                AppData.formatDate(_selectedEvents[index]
-                                    .dateTime)), //'${_selectedEvents[index].dateTime.hour} : ${_selectedEvents[index].dateTime.minute} ${_selectedEvents[index].dateTime.}')
+                                AppData.formatDate(_focusedDay
+                                    .toString())), //'${_selectedEvents[index].dateTime.hour} : ${_selectedEvents[index].dateTime.minute} ${_selectedEvents[index].dateTime.}')
                           ],
                         ),
                       ),

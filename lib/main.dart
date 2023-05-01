@@ -63,7 +63,7 @@ class _MyAppState extends State<MyApp> {
               builder: DevicePreview.appBuilder,
               debugShowCheckedModeBanner: false,
               title: 'ICGC Liberty Temple',
-              theme: ThemeClass.darkTheme,
+              theme: ThemeClass.lightTheme,
               routes: {
                 '/': (context) => const LoginPage(),
                 '/registerPage': (context) => const RegisterPage(),

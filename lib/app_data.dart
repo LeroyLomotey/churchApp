@@ -117,26 +117,16 @@ class AppData extends ChangeNotifier {
           ),
         );
       });
-      print('Event fetch response - ${response.body}');
-      print('event data - $eventData');
     } catch (error) {
       rethrow;
     }
   }
 
   _fetchBlogs() async {
-    final response = await http
-        .get(
-          _blogsUrl,
-        )
-        .then(
-          (response) {},
-        )
-        .catchError(
-          (error) => print(error),
-        );
-
-    if (response != null) {
+    try {
+      final response = await http.get(
+        _blogsUrl,
+      );
       final extractData = json.decode(response.body) as Map<String, dynamic>;
       extractData.forEach(
         (key, value) {
@@ -150,7 +140,10 @@ class AppData extends ChangeNotifier {
           );
         },
       );
+    } catch (error) {
+      rethrow;
     }
+
     print('blog data - $blogData');
   }
 
