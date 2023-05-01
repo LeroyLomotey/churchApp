@@ -11,6 +11,10 @@
 migrate_working_dir/
 keys.dart
 firebase_options.dart
+<<<<<<< HEAD
+=======
+
+>>>>>>> 17b6361f08f531eebe067d3c8c4293d96de5cec6
 # IntelliJ related
 *.iml
 *.ipr
