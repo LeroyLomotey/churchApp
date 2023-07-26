@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
+import '../services/themes.dart';
+import '../services/app_data.dart';
+import '../models/event.dart';
 
-import '../themes.dart';
-import '../app_data.dart';
-import '../event.dart';
-
-eventCard(BuildContext context, Event event) {
-  bool rsvp = false;
-
+eventCard(BuildContext context, Event event, AppData data) {
   showDialog(
       context: context,
       builder: (context) {
@@ -62,7 +59,7 @@ eventCard(BuildContext context, Event event) {
                           StatefulBuilder(
                               builder: (context, StateSetter setState) {
                             return Switch(
-                              value: rsvp,
+                              value: event.rsvpSelected,
                               trackColor:
                                   MaterialStateProperty.resolveWith<Color>(
                                       (Set<MaterialState> states) {
@@ -83,7 +80,12 @@ eventCard(BuildContext context, Event event) {
                                   Image.asset('assets/icons/check.png').image,
                               onChanged: (val) {
                                 setState(() {
-                                  rsvp = val;
+                                  event.rsvpSelected = val;
+                                  if (val) {
+                                    data.addRSVP(event, context);
+                                  } else {
+                                    data.removeRSVP(event, context);
+                                  }
                                 });
                               },
                             );

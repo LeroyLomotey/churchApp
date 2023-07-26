@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.i3d.church_app">
+    package="com.i3D.church_app">
    <application
         android:label="church_app"
         android:name="${applicationName}"

@@ -1,10 +1,14 @@
+import 'package:church_app/pages/menu/admin_page.dart';
+import 'package:church_app/pages/menu/report_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:device_preview/device_preview.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
-import 'app_data.dart';
+import 'models/user.dart';
+import 'services/app_data.dart';
 
 import './pages/login_page.dart';
 import './pages/register_page.dart';
@@ -15,17 +19,21 @@ import 'pages/menu/about_page.dart';
 import 'pages/menu/give_page.dart';
 import 'pages/menu/contact_page.dart';
 
-import 'themes.dart';
+import 'services/themes.dart';
 
 void main() async {
+  //initialize firebase app
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  //await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+
+  //initialize googe signin
+  GoogleSignIn();
+
   runApp(
-    DevicePreview(
-      builder: (context) => const MyApp(), // Wrap your app
-    ),
+    const MyApp(), // Wrap your app
   );
 
   SystemChrome.setPreferredOrientations(
@@ -46,6 +54,16 @@ class _MyAppState extends State<MyApp> {
     //Getting images from storage
     data = AppData();
     Future.delayed(Duration.zero).then((_) => data.fetchData());
+
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        //Go back to guest mode
+        data.currentUser = AppUser();
+      } else {
+        const HomePage();
+      }
+    });
+
     super.initState();
   }
 
@@ -58,9 +76,6 @@ class _MyAppState extends State<MyApp> {
           create: (_) => data,
           builder: (context, child) {
             return MaterialApp(
-              useInheritedMediaQuery: false,
-              locale: DevicePreview.locale(context),
-              builder: DevicePreview.appBuilder,
               debugShowCheckedModeBanner: false,
               title: 'ICGC Liberty Temple',
               theme: ThemeClass.lightTheme,
@@ -71,7 +86,9 @@ class _MyAppState extends State<MyApp> {
                 '/blogViewerPage': (context) => const BlogViewerPage(),
                 '/aboutPage': (context) => const AboutPage(),
                 '/contactPage': (context) => const ContactPage(),
+                '/reportPage': (context) => const ReportPage(),
                 '/givePage': (context) => const GivePage(),
+                '/adminPage': (context) => const AdminPage(),
               },
             );
           },

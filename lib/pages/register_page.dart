@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../themes.dart';
+import '../services/app_data.dart';
+import '../services/themes.dart';
+import '../services/authentication.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -10,13 +13,15 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  TextEditingController uNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  FocusNode emailNode = FocusNode();
+  TextEditingController confirmPasswordController = TextEditingController();
+  FocusNode confirmNode = FocusNode();
   FocusNode passwordNode = FocusNode();
+  bool loading = false; // for login progress on the login button
   @override
   Widget build(BuildContext context) {
+    AppData data = Provider.of<AppData>(context);
     Size screenSize = MediaQuery.of(context).size; //
 
     return SafeArea(
@@ -45,49 +50,18 @@ class _RegisterPageState extends State<RegisterPage> {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
-                  //------------------------------------------------------------------Username TextField
-                  Container(
-                    width: 300,
-                    height: 50,
-                    padding: const EdgeInsets.only(left: 15, right: 15),
-                    margin: const EdgeInsets.only(bottom: 15, top: 15),
-                    decoration: BoxDecoration(
-                      color: ThemeClass.secondaryColor,
-                      borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    ),
-                    child: TextField(
-                      controller: uNameController,
-                      autocorrect: false,
-                      // style: const TextStyle(color: Colors.white70),
-                      cursorColor: Colors.white,
-                      decoration: InputDecoration(
-                        labelText: 'Username',
-                        labelStyle: TextStyle(
-                          color: ThemeClass.darkmodeBackground,
-                        ),
-                        border: InputBorder.none,
-                        //labelStyle: TextStyle(color: Colors.white70),
-                      ),
-                      keyboardType: TextInputType.name,
-                      onEditingComplete: () {
-                        FocusScope.of(context).requestFocus(emailNode);
-                      },
-                    ),
-                  ),
                   //-------------------------------------------------------------Email TextField
-
                   Container(
                     width: 300,
                     height: 50,
                     padding: const EdgeInsets.only(left: 15, right: 15),
-                    margin: const EdgeInsets.only(bottom: 15),
                     decoration: BoxDecoration(
                       color: ThemeClass.secondaryColor,
                       borderRadius: const BorderRadius.all(Radius.circular(10)),
                     ),
                     child: TextField(
                       controller: emailController,
-                      focusNode: emailNode,
+                      //focusNode: emailNode,
                       cursorColor: Colors.white,
                       decoration: InputDecoration(
                         labelText: 'Email',
@@ -108,7 +82,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     width: 300,
                     height: 50,
                     padding: const EdgeInsets.only(left: 15, right: 15),
-                    margin: const EdgeInsets.only(bottom: 15),
                     decoration: BoxDecoration(
                       color: ThemeClass.secondaryColor,
                       borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -126,6 +99,36 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       keyboardType: TextInputType.name,
                       onEditingComplete: () {
+                        FocusScope.of(context).requestFocus(confirmNode);
+                      },
+                    ),
+                  ),
+                  //------------------------------------------------------------------Confirm password TextField
+                  Container(
+                    width: 300,
+                    height: 50,
+                    padding: const EdgeInsets.only(left: 15, right: 15),
+                    decoration: BoxDecoration(
+                      color: ThemeClass.secondaryColor,
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    ),
+                    child: TextField(
+                      controller: confirmPasswordController,
+                      autocorrect: false,
+                      // style: const TextStyle(color: Colors.white70),
+                      focusNode: confirmNode,
+                      obscureText: true,
+                      cursorColor: Colors.white,
+                      decoration: InputDecoration(
+                        labelText: 'Confirm Password',
+                        labelStyle: TextStyle(
+                          color: ThemeClass.darkmodeBackground,
+                        ),
+                        border: InputBorder.none,
+                        //labelStyle: TextStyle(color: Colors.white70),
+                      ),
+                      keyboardType: TextInputType.name,
+                      onEditingComplete: () {
                         FocusScope.of(context).unfocus();
                       },
                     ),
@@ -133,9 +136,27 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   //----------------------------------------------------------------------------Register button
                   GestureDetector(
-                    onTap: () {
+                    onTap: () async {
+                      //When login tapped, show loading indicator
+                      setState(() {
+                        loading = true;
+                      });
+                      var result = await Authentication().register(
+                          email: emailController.text,
+                          password: passwordController.text,
+                          confirmPassword: confirmPasswordController.text,
+                          context: context);
+
+                      if (result) {
+                        Navigator.of(context).pushNamed('/');
+                      }
+                      //hide loading indicator
+                      setState(() {
+                        loading = false;
+                      });
+
                       FocusScope.of(context).unfocus();
-                      uNameController.clear();
+                      confirmPasswordController.clear();
                       passwordController.clear();
                       emailController.clear();
                     },
@@ -156,9 +177,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                 blurRadius: 4,
                               )
                             ]),
-                        child: Text("Register",
-                            style: Theme.of(context).textTheme.titleMedium,
-                            textAlign: TextAlign.center)),
+                        child: loading
+                            ? CircularProgressIndicator(
+                                color: ThemeClass.secondaryColor)
+                            : Text("Register",
+                                style: Theme.of(context).textTheme.titleMedium,
+                                textAlign: TextAlign.center)),
                   ),
 
                   //Continue with
@@ -168,20 +192,30 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        //Google icon
-                        Container(
-                          width: 50,
-                          height: 50,
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(15)),
-                            border: Border.all(
-                                color: ThemeClass.primaryColor, width: 2),
-                            color: ThemeClass.secondaryColor,
+                        //Google button
+                        GestureDetector(
+                          onTap: () async {
+                            bool result = await Authentication()
+                                .googleLogin(context: context, data: data);
+
+                            if (result) {
+                              Navigator.of(context).pushNamed('/homePage');
+                            }
+                          },
+                          child: Container(
+                            width: 50,
+                            height: 50,
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(15)),
+                              border: Border.all(
+                                  color: ThemeClass.primaryColor, width: 2),
+                              color: ThemeClass.secondaryColor,
+                            ),
+                            child: Image.asset('assets/icons/google.png',
+                                color: Colors.black),
                           ),
-                          child: Image.asset('assets/icons/google.png',
-                              color: Colors.black),
                         ),
                         //Apple icon
                         Container(

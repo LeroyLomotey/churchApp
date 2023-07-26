@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../themes.dart';
+import '../services/themes.dart';
 
 class NavBar extends StatefulWidget {
   final Function changeTabFunction;
@@ -12,10 +12,10 @@ class NavBar extends StatefulWidget {
 
 class _NavBarState extends State<NavBar> {
   final Map<String, IconData> iconData = {
-    '/home': Icons.home,
-    '/calendar': Icons.calendar_month,
-    '/flyers': Icons.collections,
-    '/livestream': Icons.videocam
+    '/Home': Icons.home,
+    '/Calendar': Icons.calendar_month,
+    '/Flyers': Icons.collections,
+    '/Livestream': Icons.videocam
   };
 
   Widget buildIcon(MapEntry i) {

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../themes.dart';
+import '../services/app_data.dart';
+import '../services/authentication.dart';
+import '../services/themes.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,18 +13,22 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController uNameController = TextEditingController();
+  //TextEditingController uNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   FocusNode emailNode = FocusNode();
   FocusNode passwordNode = FocusNode();
+  bool loading = false; // for login progress on the login button
+
   @override
   Widget build(BuildContext context) {
+    AppData data = Provider.of<AppData>(context);
     Size screenSize = MediaQuery.of(context).size;
 
-    return SafeArea(
+    return WillPopScope(
+      onWillPop: () async => false,
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         body: SingleChildScrollView(
           child: Container(
             height: screenSize.height,
@@ -45,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
-                //------------------------------------------------------------------Username TextField
+                //------------------------------------------------------------------Email TextField
                 Container(
                   width: 300,
                   height: 50,
@@ -59,12 +66,12 @@ class _LoginPageState extends State<LoginPage> {
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
                   ),
                   child: TextField(
-                    controller: uNameController,
+                    controller: emailController,
                     autocorrect: false,
                     // style: const TextStyle(color: Colors.white70),
                     cursorColor: Colors.white,
                     decoration: InputDecoration(
-                      labelText: 'Username',
+                      labelText: 'Email',
                       labelStyle: TextStyle(
                         color: ThemeClass.darkmodeBackground,
                       ),
@@ -119,16 +126,40 @@ class _LoginPageState extends State<LoginPage> {
                             child: Text("Forgot password?",
                                 style:
                                     TextStyle(color: ThemeClass.primaryColor)),
-                            onPressed: () => {})),
+                            onPressed: () async {
+                              FocusScope.of(context).unfocus();
+                              await Authentication().forgotPassword(
+                                  email: emailController.text,
+                                  context: context);
+                            })),
                   ],
                 ),
                 //----------------------------------------------------------------------------Login button
                 GestureDetector(
-                  onTap: () {
+                  onTap: () async {
+                    //When login tapped, show loading indicator
+                    setState(() {
+                      loading = true;
+                    });
+
                     FocusScope.of(context).unfocus();
-                    uNameController.clear();
-                    passwordController.clear();
-                    Navigator.of(context).pushNamed('/homePage');
+                    var result = await Authentication().login(
+                        email: emailController.text,
+                        password: passwordController.text,
+                        context: context,
+                        data: data);
+
+                    //If successful signin, clear and go to home
+                    if (result) {
+                      passwordController.clear();
+                      emailController.clear();
+                      Navigator.of(context).pushReplacementNamed('/homePage');
+                    }
+
+                    //hide loading indicator
+                    setState(() {
+                      loading = false;
+                    });
                   },
                   child: Container(
                       width: 300,
@@ -147,9 +178,12 @@ class _LoginPageState extends State<LoginPage> {
                               blurRadius: 4,
                             )
                           ]),
-                      child: Text("Login",
-                          style: Theme.of(context).textTheme.bodyMedium,
-                          textAlign: TextAlign.center)),
+                      child: loading
+                          ? CircularProgressIndicator(
+                              color: ThemeClass.secondaryColor)
+                          : Text("Login",
+                              style: Theme.of(context).textTheme.bodyMedium,
+                              textAlign: TextAlign.center)),
                 ),
 
                 //Continue with
@@ -160,19 +194,35 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       //Google icon
-                      Container(
-                        width: 50,
-                        height: 50,
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(15)),
-                          border: Border.all(
-                              color: ThemeClass.primaryColor, width: 2),
-                          color: ThemeClass.secondaryColor,
+                      GestureDetector(
+                        onTap: () async {
+                          bool result = await Authentication()
+                              .googleLogin(context: context, data: data);
+                          //Navigator.of(context).pop();
+                          if (result) {
+                            passwordController.clear();
+                            emailController.clear();
+                            Navigator.of(context)
+                                .pushReplacementNamed('/homePage');
+                          } else {
+                            Navigator.of(context)
+                                .pushReplacementNamed('/homePage');
+                          }
+                        },
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(15)),
+                            border: Border.all(
+                                color: ThemeClass.primaryColor, width: 2),
+                            color: ThemeClass.secondaryColor,
+                          ),
+                          child: Image.asset('assets/icons/google.png',
+                              color: const Color(0xFF1C1B1F)),
                         ),
-                        child: Image.asset('assets/icons/google.png',
-                            color: const Color(0xFF1C1B1F)),
                       ),
                       //Apple icon
                       Container(

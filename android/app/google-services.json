@@ -8,42 +8,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:921277221310:android:f844b3f3559705285d91ef",
-        "android_client_info": {
-          "package_name": "com.example.church_app"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "921277221310-mddievn13imcg8jiomt6o41nqli41qeo.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyD9ElXgMdpIBoMROUukkUodUMWYKEOQyeo"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "921277221310-mddievn13imcg8jiomt6o41nqli41qeo.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "921277221310-pfpcidgfl0tlnaiqigc461b8kar234c4.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.churchApp"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:921277221310:android:f194b6b779153dd05d91ef",
         "android_client_info": {
           "package_name": "com.i3D.church_app"
@@ -51,7 +15,23 @@
       },
       "oauth_client": [
         {
-          "client_id": "921277221310-mddievn13imcg8jiomt6o41nqli41qeo.apps.googleusercontent.com",
+          "client_id": "921277221310-0gu9e47c93asln6vpjv9pa96p5fq3229.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.i3D.church_app",
+            "certificate_hash": "4edd5b354eac8ce78be1126ee6a388e0c31700e0"
+          }
+        },
+        {
+          "client_id": "921277221310-mqrula0s37kcmpoovlbmarfon4n1baj5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.i3D.church_app",
+            "certificate_hash": "ee611b8556dd287958423e54e5c227bc76a9c67f"
+          }
+        },
+        {
+          "client_id": "921277221310-6vs49etjg7dhisucuc62qqig4uuvks12.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -64,43 +44,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "921277221310-mddievn13imcg8jiomt6o41nqli41qeo.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "921277221310-pfpcidgfl0tlnaiqigc461b8kar234c4.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.churchApp"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:921277221310:android:4e088e50a916529f5d91ef",
-        "android_client_info": {
-          "package_name": "com.i3d.church_app"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "921277221310-mddievn13imcg8jiomt6o41nqli41qeo.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyD9ElXgMdpIBoMROUukkUodUMWYKEOQyeo"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "921277221310-mddievn13imcg8jiomt6o41nqli41qeo.apps.googleusercontent.com",
+              "client_id": "921277221310-6vs49etjg7dhisucuc62qqig4uuvks12.apps.googleusercontent.com",
               "client_type": 3
             },
             {
