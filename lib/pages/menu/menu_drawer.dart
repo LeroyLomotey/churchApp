@@ -1,9 +1,11 @@
 import 'package:church_app/services/authentication.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../services/app_data.dart';
 
 class MenuDrawer extends StatefulWidget {
-  final bool isAdmin;
-  const MenuDrawer({super.key, required this.isAdmin});
+  const MenuDrawer({super.key});
 
   @override
   State<MenuDrawer> createState() => _MenuDrawerState();
@@ -13,6 +15,7 @@ class _MenuDrawerState extends State<MenuDrawer> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    AppData data = context.read<AppData>();
     return Drawer(
       backgroundColor: Theme.of(context).primaryColor,
       width: size.width * 0.5,
@@ -22,7 +25,7 @@ class _MenuDrawerState extends State<MenuDrawer> {
       child: Column(
         children: [
           //Only show admin button is user has permission
-          widget.isAdmin
+          context.watch<AppData>().currentUser.isAdmin
               ? ListTile(
                   title: Text(
                     'Admin Panel',
@@ -61,15 +64,27 @@ class _MenuDrawerState extends State<MenuDrawer> {
             onTap: () => Navigator.of(context).pushNamed('/givePage'),
           ),
           ListTile(
+            title: Text(
+              'Dark Mode',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            trailing: Switch(
+                value: data.darkMode,
+                onChanged: (value) => setState(() {
+                      print('dark mode is $value');
+                      data.darkMode = value;
+                      print('dark mode but variable is ${data.darkMode}');
+                    })),
+          ),
+          ListTile(
               title: Text(
                 'Logout',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               //remove all previous pages from the stack and go to login page
               onTap: () {
-                Authentication().logout();
-                Navigator.of(context)
-                    .pushNamedAndRemoveUntil('/', (route) => false);
+                Authentication().logout().then((value) => Navigator.of(context)
+                    .pushNamedAndRemoveUntil('/loginPage', (route) => false));
               })
         ],
       ),

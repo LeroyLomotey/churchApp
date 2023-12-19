@@ -41,27 +41,30 @@ dependencies:
   intl:
   share_plus:
   path_provider:
-  webview_flutter:
   http:
   firebase_storage: ^11.1.1
+  firebase_database:
   firebase_core:
   transparent_image:
   flutter_riverpod:
   firebase_auth: ^4.6.3
   google_sign_in: ^6.1.4
   flutter_quill:
+  image_picker:
+  youtube_player_flutter: ^8.1.2
+  flutter_native_splash:
+  firebase_messaging: ^14.6.5
+  google_mobile_ads: ^3.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   device_preview: ^1.1.0
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
+flutter_native_splash:
+  image: assets/images/logo.png
+  color: "#f9f9f9"
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

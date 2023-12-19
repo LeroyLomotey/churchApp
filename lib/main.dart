@@ -1,13 +1,16 @@
 import 'package:church_app/pages/menu/admin_page.dart';
 import 'package:church_app/pages/menu/report_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:church_app/services/authentication.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:church_app/services/themes.dart';
 import 'package:firebase_core/firebase_core.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
-import 'models/user.dart';
 import 'services/app_data.dart';
 
 import './pages/login_page.dart';
@@ -19,15 +22,22 @@ import 'pages/menu/about_page.dart';
 import 'pages/menu/give_page.dart';
 import 'pages/menu/contact_page.dart';
 
-import 'services/themes.dart';
-
 void main() async {
   //initialize firebase app
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+
+  //initialize mobile ads
+  MobileAds.instance.initialize();
+  //Screen orientation
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  //await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+  //Connect to notification API
+  //await NotiicationAPI().initNotifcations();
+  //Keeps splash screen until manually removed
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   //initialize googe signin
   GoogleSignIn();
@@ -35,9 +45,6 @@ void main() async {
   runApp(
     const MyApp(), // Wrap your app
   );
-
-  SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitUp]);
 }
 
 class MyApp extends StatefulWidget {
@@ -48,39 +55,39 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late AppData data;
-  @override
-  void initState() {
-    //Getting images from storage
-    data = AppData();
-    Future.delayed(Duration.zero).then((_) => data.fetchData());
+  AppData data = AppData();
 
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      if (user == null) {
-        //Go back to guest mode
-        data.currentUser = AppUser();
-      } else {
-        const HomePage();
-      }
-    });
-
-    super.initState();
+  checkUser() {
+    final user = Authentication().currentUser;
+    if (user == null) {
+      FlutterNativeSplash.remove();
+    } else {
+      FlutterNativeSplash.remove();
+    }
+    return user;
   }
 
   @override
   Widget build(BuildContext context) {
-    // Size size = MediaQuery.of(context).size;
+    Future.delayed(Duration.zero).then((_) => data.fetchData());
+
+    //FF FlutterNativeSplash.remove();
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<AppData>(
           create: (_) => data,
           builder: (context, child) {
+            data = context.watch<AppData>();
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               title: 'ICGC Liberty Temple',
-              theme: ThemeClass.lightTheme,
+              theme: context.watch<AppData>().darkMode
+                  ? ThemeClass.darkTheme
+                  : ThemeClass.lightTheme,
               routes: {
-                '/': (context) => const LoginPage(),
+                '/': (context) =>
+                    checkUser() == null ? const LoginPage() : const HomePage(),
+                '/loginPage': (context) => const LoginPage(),
                 '/registerPage': (context) => const RegisterPage(),
                 '/homePage': (context) => const HomePage(),
                 '/blogViewerPage': (context) => const BlogViewerPage(),

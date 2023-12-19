@@ -7,7 +7,11 @@ import '../services/error_handling.dart';
 import 'app_data.dart';
 
 class Authentication {
-  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  User? get currentUser => _firebaseAuth.currentUser;
+
+  Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
   RegExp emailReg = RegExp(
       r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$");
@@ -27,14 +31,15 @@ class Authentication {
       ErrorHandler().userAuthErrorMessage('mismatch-password', context);
     } else {
       try {
-        await firebaseAuth.createUserWithEmailAndPassword(
+        await _firebaseAuth.createUserWithEmailAndPassword(
             email: email, password: password);
+        return true;
       } on FirebaseAuthException catch (e) {
         ErrorHandler().userAuthErrorMessage(e as String, context);
         return false;
       }
     }
-    return true;
+    return false;
   }
 
   //Login with Email and Password
@@ -44,7 +49,7 @@ class Authentication {
       required BuildContext context,
       required AppData data}) async {
     try {
-      final userCredential = await firebaseAuth.signInWithEmailAndPassword(
+      final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
 
       final user = userCredential.user;
@@ -56,9 +61,9 @@ class Authentication {
         name: '',
         guest: false,
         email: authenticatedEmail,
-        isAdmin: true,
+        isAdmin: await AppData.isAdmin(uid),
       );
-      data.fetchEvents();
+      //data.fetchEvents();
     } on FirebaseAuthException catch (e) {
       ErrorHandler().userAuthErrorMessage(e.code, context);
       return false;
@@ -97,9 +102,9 @@ class Authentication {
         name: name,
         guest: false,
         email: authenticatedEmail,
-        isAdmin: true,
+        isAdmin: await AppData.isAdmin(uid),
       );
-      data.fetchEvents();
+      AppData().fetchEvents();
     } on FirebaseAuthException catch (e) {
       ErrorHandler().userAuthErrorMessage(e.code, context);
       print(e);
@@ -116,10 +121,10 @@ class Authentication {
   Future<bool> forgotPassword(
       {required String email, required BuildContext context}) async {
     if (email == '' || !emailReg.hasMatch(email)) {
-      ErrorHandler().userAuthErrorMessage('invalid_email', context);
+      ErrorHandler().userAuthErrorMessage('invalid-email', context);
     } else {
       try {
-        await firebaseAuth.sendPasswordResetEmail(email: email);
+        await _firebaseAuth.sendPasswordResetEmail(email: email);
         return true;
       } on FirebaseAuthException catch (e) {
         ErrorHandler().userAuthErrorMessage(e.code, context);
@@ -133,6 +138,6 @@ class Authentication {
   Future logout() async {
     AppData().resetdata();
     await GoogleSignIn().signOut();
-    await firebaseAuth.signOut();
+    await _firebaseAuth.signOut();
   }
 }

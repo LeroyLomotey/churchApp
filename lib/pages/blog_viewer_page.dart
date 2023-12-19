@@ -1,6 +1,8 @@
-import 'package:church_app/models/event.dart';
+import 'dart:convert';
+
 import 'package:church_app/pages/menu/menu_drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:provider/provider.dart';
 
 import '../models/blog.dart';
@@ -11,16 +13,25 @@ class BlogViewerPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppData data = Provider.of<AppData>(context);
+    AppData data = context.read<AppData>();
     Size size = MediaQuery.of(context).size;
     final args =
         ModalRoute.of(context)!.settings.arguments as Map<String, Blog>;
+    QuillController controller = QuillController.basic();
     final currentBlog = args['blog'];
-    final title = currentBlog!.title;
-    final body = currentBlog.body;
-    final date = currentBlog.date;
-    final image = currentBlog.image;
+    var bodyJSON = jsonDecode(currentBlog!.body);
+    controller = QuillController(
+      document: Document.fromJson(bodyJSON),
+      selection: const TextSelection.collapsed(offset: 0),
+    );
 
+    final title = currentBlog.title;
+    final body = controller.document.toPlainText();
+    final date = currentBlog.date;
+    var image = currentBlog.image;
+    if (image.length < 5 || image == 'null') {
+      image = 'assets/images/logo.png';
+    }
     return SafeArea(
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
@@ -34,14 +45,6 @@ class BlogViewerPage extends StatelessWidget {
               return IconButton(
                   onPressed: () {
                     Scaffold.of(context).openEndDrawer();
-                    data.addEvent(
-                        Event(
-                            title: 'test',
-                            location: 'test',
-                            dateTime: DateTime.now().toString(),
-                            recurring: false,
-                            rsvp: true),
-                        context);
                   },
                   icon: Image.asset('assets/icons/menu.png',
                       color: Theme.of(context)
@@ -67,7 +70,10 @@ class BlogViewerPage extends StatelessWidget {
                         decoration: const BoxDecoration(
                             color: Colors.black54, shape: BoxShape.circle),
                         child: IconButton(
-                            onPressed: () => data.shareBlog(image, title, body),
+                            onPressed: () async {
+                              final imageFile = await data.downloadImage(image);
+                              data.shareBlog(imageFile, title, body);
+                            },
                             icon: const Icon(Icons.ios_share,
                                 size: 25, color: Colors.white)))),
                 //---------------------------------Title
@@ -101,15 +107,16 @@ class BlogViewerPage extends StatelessWidget {
                         ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child:
-                      Text(body, style: Theme.of(context).textTheme.bodyMedium),
-                ),
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Expanded(
+                      child: QuillEditor.basic(
+                          controller: controller, readOnly: true),
+                    )),
               ],
             ),
           ),
         ),
-        endDrawer: MenuDrawer(isAdmin: data.currentUser.isAdmin),
+        endDrawer: const MenuDrawer(),
       ),
     );
   }

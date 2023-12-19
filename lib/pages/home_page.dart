@@ -62,41 +62,58 @@ class _HomePageState extends State<HomePage>
     AppData data = Provider.of<AppData>(context);
     Size screenSize = MediaQuery.of(context).size;
     NavBar navBar = NavBar(changeTabFunction: changeTab);
+    bool navBarVisible = true;
+    bool appBarVisible = true;
     return WillPopScope(
       //Prevents back button from going to empty stack
       onWillPop: () async => false,
       child: SafeArea(
-        child: Scaffold(
-          backgroundColor: Theme.of(context).primaryColor,
-          body: Stack(children: [
-            Center(
-                child: Image.asset('assets/images/logo.png',
-                    color: Colors.green.withOpacity(0.2))),
-            AnimationManager().tabTransition(
-                controller: _controller,
-                child: tabs[currentTab]!,
-                size: screenSize),
-            navBar,
-          ]),
-          appBar: AppBar(
-            leading: IconButton(
-                onPressed: () => Navigator.of(context).maybePop(),
-                icon: const Icon(Icons.arrow_back_ios_new)),
-            title: Center(child: Text(currentTab.substring(1))),
-            actions: [
-              Builder(builder: (context) {
-                return IconButton(
-                    onPressed: () => Scaffold.of(context).openEndDrawer(),
-                    icon: Image.asset('assets/icons/menu.png',
-                        color: Theme.of(context)
-                            .appBarTheme
-                            .actionsIconTheme!
-                            .color));
-              })
-            ],
-          ),
-          endDrawer: MenuDrawer(isAdmin: data.currentUser.isAdmin),
-        ),
+        child: OrientationBuilder(builder: (context, orientation) {
+          /*Lock the screen orientation to portrait mode
+          
+          */
+          if (orientation == Orientation.landscape) {
+            navBarVisible = false;
+            appBarVisible = false;
+          } else {
+            navBarVisible = true;
+            appBarVisible = true;
+          }
+          return Scaffold(
+            backgroundColor: Theme.of(context).primaryColor,
+            body: Stack(children: [
+              Center(
+                  child: Image.asset('assets/images/logo.png',
+                      color: Colors.green.withOpacity(0.2))),
+              AnimationManager().tabTransition(
+                  controller: _controller,
+                  child: tabs[currentTab]!,
+                  size: screenSize),
+              Visibility(visible: navBarVisible, child: navBar),
+            ]),
+            appBar: appBarVisible
+                ? AppBar(
+                    leading: IconButton(
+                        onPressed: () => Navigator.of(context).maybePop(),
+                        icon: const Icon(Icons.arrow_back_ios_new)),
+                    title: Center(child: Text(currentTab.substring(1))),
+                    actions: [
+                      Builder(builder: (context) {
+                        return IconButton(
+                            onPressed: () =>
+                                Scaffold.of(context).openEndDrawer(),
+                            icon: Image.asset('assets/icons/menu.png',
+                                color: Theme.of(context)
+                                    .appBarTheme
+                                    .actionsIconTheme!
+                                    .color));
+                      })
+                    ],
+                  )
+                : null,
+            endDrawer: const MenuDrawer(),
+          );
+        }),
       ),
     );
   }

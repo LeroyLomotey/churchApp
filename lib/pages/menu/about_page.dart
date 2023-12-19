@@ -109,7 +109,7 @@ class AboutPage extends StatelessWidget {
                   ],
                 )),
           ),
-          endDrawer: MenuDrawer(isAdmin: data.currentUser.isAdmin)),
+          endDrawer: const MenuDrawer()),
     );
   }
 }

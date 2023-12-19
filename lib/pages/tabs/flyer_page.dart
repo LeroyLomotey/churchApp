@@ -10,8 +10,8 @@ class FlyerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    final appData = Provider.of<AppData>(context);
-    var flyers = appData.flyerData;
+    final data = Provider.of<AppData>(context);
+    var flyers = data.flyerData.reversed.toList();
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: 80),
       itemCount: flyers.length,
@@ -31,8 +31,17 @@ class FlyerPage extends StatelessWidget {
                   ),
                 ),
                 child: Image.network(
+                  color: const Color.fromARGB(158, 47, 109, 54),
+                  colorBlendMode: BlendMode.lighten,
                   flyers[index],
                   width: screenSize.width,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.network(
+                      AppData.defaultNetwork,
+                      fit: BoxFit.cover,
+                    );
+                  },
                 ),
               ),
             ),
@@ -41,8 +50,8 @@ class FlyerPage extends StatelessWidget {
                 top: 30,
                 child: GestureDetector(
                   onTap: () async {
-                    final path = await appData.downloadImage(flyers[index]);
-                    appData.shareImage(path);
+                    final path = await data.downloadImage(flyers[index]);
+                    data.shareImage(path);
                   },
                   child: Container(
                       width: 50,

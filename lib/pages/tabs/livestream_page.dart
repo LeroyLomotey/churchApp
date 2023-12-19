@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+
+import '../../services/app_data.dart';
+import '../../services/themes.dart';
 
 class StreamPage extends StatefulWidget {
   const StreamPage({super.key});
@@ -9,16 +13,41 @@ class StreamPage extends StatefulWidget {
 }
 
 class _StreamPageState extends State<StreamPage> {
-  WebViewController controller = WebViewController()
-    ..setJavaScriptMode(JavaScriptMode.unrestricted)
-    ..setBackgroundColor(const Color(0x00000000))
-    ..loadRequest(Uri.parse('https://www.youtube.com/@ICGCNJLT/streams'));
+  late YoutubePlayerController _controller;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    String link = Provider.of<AppData>(context).streamLink;
+
+    final videoId =
+        Uri.parse(link).pathSegments.last; //?? AppData.defaultVideo;
+    print('Vid ID ${Uri.parse(link).pathSegments.last}');
+    //print('No match? ${match.toString()}');
+    setState(() {
+      // Load the new video
+      _controller = YoutubePlayerController(
+          initialVideoId: videoId,
+          flags: const YoutubePlayerFlags(
+            isLive: true,
+            autoPlay: false,
+          ));
+    });
     return SafeArea(
-      child: Scaffold(
-        body: WebViewWidget(controller: controller),
+      child: Center(
+        child: YoutubePlayer(
+          controller: _controller,
+          showVideoProgressIndicator: true,
+          progressColors: ProgressBarColors(
+            playedColor: ThemeClass.primaryColor,
+            handleColor: ThemeClass.primaryColor,
+          ),
+        ),
       ),
     );
   }

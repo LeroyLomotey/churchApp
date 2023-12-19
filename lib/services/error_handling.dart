@@ -50,7 +50,7 @@ class ErrorHandler {
   }
 
   customMessage(String message, BuildContext context) {
-    errorMessage = message;
-    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    final snack = SnackBar(content: Text(message));
+    ScaffoldMessenger.of(context).showSnackBar(snack);
   }
 }

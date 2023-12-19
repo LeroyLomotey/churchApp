@@ -1,3 +1,5 @@
+import '../services/app_data.dart';
+
 class Blog {
   String id;
   final String title;
@@ -9,6 +11,6 @@ class Blog {
       {this.id = '',
       required this.title,
       required this.body,
-      this.image = 'assets/images/reader.png',
+      this.image = AppData.defaultLocal,
       required this.date});
 }

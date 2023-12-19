@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../services/app_data.dart';
@@ -21,6 +22,13 @@ class _LoginPageState extends State<LoginPage> {
   bool loading = false; // for login progress on the login button
 
   @override
+  void initState() {
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     AppData data = Provider.of<AppData>(context);
     Size screenSize = MediaQuery.of(context).size;
@@ -28,16 +36,16 @@ class _LoginPageState extends State<LoginPage> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        resizeToAvoidBottomInset: true,
+        resizeToAvoidBottomInset: false,
         body: SingleChildScrollView(
           child: Container(
             height: screenSize.height,
             width: screenSize.width,
             color: Theme.of(context).primaryColor,
-            padding: EdgeInsets.only(
+            padding: const EdgeInsets.only(
               left: 15,
               right: 15,
-              bottom: MediaQuery.of(context).viewInsets.bottom,
+              // bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -123,9 +131,11 @@ class _LoginPageState extends State<LoginPage> {
                             style: ButtonStyle(
                                 overlayColor: MaterialStateProperty.all(
                                     Colors.transparent)),
-                            child: Text("Forgot password?",
-                                style:
-                                    TextStyle(color: ThemeClass.primaryColor)),
+                            child: Text(
+                              "Forgot password?",
+                              style:
+                                  TextStyle(color: ThemeClass.secondaryColor),
+                            ),
                             onPressed: () async {
                               FocusScope.of(context).unfocus();
                               await Authentication().forgotPassword(
@@ -258,14 +268,12 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      'Are you new?',
-                    ),
+                    const Text('Are you new?'),
                     TextButton(
                         onPressed: () =>
                             Navigator.pushNamed(context, '/registerPage'),
                         child: Text('Register now',
-                            style: TextStyle(color: ThemeClass.primaryColor)))
+                            style: TextStyle(color: ThemeClass.secondaryColor)))
                   ],
                 ),
               ],

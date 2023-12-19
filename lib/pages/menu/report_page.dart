@@ -32,7 +32,7 @@ class _ReportPageState extends State<ReportPage> {
           })
         ],
       ),
-      endDrawer: MenuDrawer(isAdmin: data.currentUser.isAdmin),
+      endDrawer: const MenuDrawer(),
     ));
   }
 }
